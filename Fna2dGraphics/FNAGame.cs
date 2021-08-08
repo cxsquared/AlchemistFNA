@@ -1,4 +1,6 @@
-﻿using Microsoft.Xna.Framework;
+﻿using Fna2dGraphics.Entities;
+using Fna2dGraphics.Entities.Animation;
+using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
 
@@ -21,6 +23,7 @@ namespace Fna2dGraphics
 
         Entity snowmanOne;
         Entity snowmanTwo;
+        AnimatedEntity runner;
 
         private FNAGame()
         {
@@ -44,14 +47,22 @@ namespace Fna2dGraphics
              * loading configuration stuff in the constructor
              */
             snowmanOne = new Entity(
-                new Vector2(500, 500),
+                500, 500,
                 Color.White);
 
             snowmanTwo = new Entity(
-                new Vector2(400, 400),
+                400, 400,
                 Color.Plum,
                 0.0f,
                 0.5f);
+
+            runner = new AnimatedEntity(200, 200, Color.White);
+            runner.AnimationManager.Add(new Animation(
+                "run",
+                20,
+                new[] { 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11 },
+                true));
+            runner.AnimationManager.Play("run");
 
             base.Initialize();
         }
@@ -65,8 +76,10 @@ namespace Fna2dGraphics
             var snowmanSourceOrigin = new Vector2(128, 192);
             var snowAssets = "snow_assets";
 
-            snowmanOne.Load(snowAssets, snowmanSourceLocation, snowmanSourceOrigin);
-            snowmanTwo.Load(snowAssets, snowmanSourceLocation, snowmanSourceOrigin);
+            snowmanOne.LoadGraphic(snowAssets, snowmanSourceLocation, snowmanSourceOrigin);
+            snowmanTwo.LoadGraphic(snowAssets, snowmanSourceLocation, snowmanSourceOrigin);
+
+            runner.LoadGraphic("run_cycle", new Rectangle(0, 0, 128, 128), new Vector2(0, 0));
 
             base.LoadContent();
         }
@@ -84,16 +97,18 @@ namespace Fna2dGraphics
                 this.Exit();
 
             if (Keyboard.GetState().IsKeyDown(Keys.Left))
-                snowmanTwo.Move(-1, 0);
+                runner.Move(-1, 0);
 
             if (Keyboard.GetState().IsKeyDown(Keys.Right))
-                snowmanTwo.Move(1, 0);
+                runner.Move(1, 0);
 
             if (Keyboard.GetState().IsKeyDown(Keys.Up))
-                snowmanTwo.Move(0, -1);
+                runner.Move(0, -1);
 
             if (Keyboard.GetState().IsKeyDown(Keys.Down))
-                snowmanTwo.Move(0, 1);
+                runner.Move(0, 1);
+
+            runner.Update(gameTime);
 
             base.Update(gameTime);
         }
@@ -108,6 +123,7 @@ namespace Fna2dGraphics
             //Create a loop of draw commands
             snowmanOne.Draw(gameTime, spriteBatch, CalculateDepth(snowmanOne, 720));
             snowmanTwo.Draw(gameTime, spriteBatch, CalculateDepth(snowmanTwo, 720));
+            runner.Draw(gameTime, spriteBatch, CalculateDepth(runner, 720));
 
             spriteBatch.End();
 
