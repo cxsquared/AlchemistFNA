@@ -1,5 +1,7 @@
 ﻿using Fna2dGraphics.Entities;
 using Fna2dGraphics.Entities.Animation;
+using Fna2dGraphics.Entities.ComponentManagers;
+using Fna2dGraphics.Entities.Components;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
@@ -21,9 +23,10 @@ namespace Fna2dGraphics
 
         SpriteBatch spriteBatch;
 
-        Entity snowmanOne;
-        Entity snowmanTwo;
-        AnimatedEntity runner;
+        TransformManager tm;
+        RenderableManager rm;
+        PressedKeyInputManager pkIm;
+        PlayerMovementManager pmm;
 
         private FNAGame()
         {
@@ -39,6 +42,11 @@ namespace Fna2dGraphics
             };
 
             Content.RootDirectory = "Content";
+
+            tm = new TransformManager();
+            rm = new RenderableManager(tm);
+            pkIm = new PressedKeyInputManager();
+            pmm = new PlayerMovementManager(tm, pkIm);
         }
 
         protected override void Initialize()
@@ -46,16 +54,23 @@ namespace Fna2dGraphics
             /* This is a nice place to start up the engine, after
              * loading configuration stuff in the constructor
              */
-            snowmanOne = new Entity(
-                500, 500,
-                Color.White);
+            tm.Insert(0, new Transform
+            {
+                Position = new Vector2(500, 500),
+                Rotation = 0,
+                Scale = 1
+            });
 
-            snowmanTwo = new Entity(
-                400, 400,
-                Color.Plum,
-                0.0f,
-                0.5f);
+            tm.Insert(1, new Transform
+            {
+                Position = new Vector2(400, 400),
+                Rotation = 0,
+                Scale = 0.5f
+            });
 
+            pmm.Insert(1, new PlayerMovement());
+
+            /*
             runner = new AnimatedEntity(200, 200, Color.White);
             runner.AnimationManager.Add(new Animation(
                 "run",
@@ -63,6 +78,7 @@ namespace Fna2dGraphics
                 new[] { 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11 },
                 true));
             runner.AnimationManager.Play("run");
+            */
 
             base.Initialize();
         }
@@ -74,12 +90,28 @@ namespace Fna2dGraphics
 
             var snowmanSourceLocation = new Rectangle(0, 128, 256, 256);
             var snowmanSourceOrigin = new Vector2(128, 192);
-            var snowAssets = "snow_assets";
 
-            snowmanOne.LoadGraphic(snowAssets, snowmanSourceLocation, snowmanSourceOrigin);
-            snowmanTwo.LoadGraphic(snowAssets, snowmanSourceLocation, snowmanSourceOrigin);
+            var snowTexture = ContentManagerProvider.Content.Load<Texture2D>("snow_assets");
+
+            rm.Insert(0, new Renderable
+            {
+                Texture = snowTexture,
+                TextureRectangle = snowmanSourceLocation,
+                Origin = snowmanSourceOrigin,
+                Color = Color.White
+            });
+
+            rm.Insert(1, new Renderable
+            {
+                Texture = snowTexture,
+                TextureRectangle = snowmanSourceLocation,
+                Origin = snowmanSourceOrigin,
+                Color = Color.Plum
+            });
+            /*
 
             runner.LoadGraphic("run_cycle", new Rectangle(0, 0, 128, 128), new Vector2(0, 0));
+            */
 
             base.LoadContent();
         }
@@ -96,6 +128,10 @@ namespace Fna2dGraphics
             if (GamePad.GetState(PlayerIndex.One).Buttons.Back == ButtonState.Pressed)
                 this.Exit();
 
+            pkIm.UpdateInputs();
+            pmm.Update(gameTime);
+
+            /*
             if (Keyboard.GetState().IsKeyDown(Keys.Left))
                 runner.Move(-1, 0);
 
@@ -109,6 +145,7 @@ namespace Fna2dGraphics
                 runner.Move(0, 1);
 
             runner.Update(gameTime);
+            */
 
             base.Update(gameTime);
         }
@@ -121,18 +158,11 @@ namespace Fna2dGraphics
             spriteBatch.Begin(SpriteSortMode.FrontToBack, BlendState.AlphaBlend);
 
             //Create a loop of draw commands
-            snowmanOne.Draw(gameTime, spriteBatch, CalculateDepth(snowmanOne, 720));
-            snowmanTwo.Draw(gameTime, spriteBatch, CalculateDepth(snowmanTwo, 720));
-            runner.Draw(gameTime, spriteBatch, CalculateDepth(runner, 720));
+            rm.Draw(spriteBatch);
 
             spriteBatch.End();
 
             base.Draw(gameTime);
-        }
-
-        float CalculateDepth(Entity entity, float screenHeight)
-        {
-            return entity.Location.Y / screenHeight;
         }
     }
 }

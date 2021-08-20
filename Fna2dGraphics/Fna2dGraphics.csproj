@@ -64,10 +64,19 @@
     <Compile Include="Entities\Animation\Animation.cs" />
     <Compile Include="Entities\Animation\AnimationManager.cs" />
     <Compile Include="Entities\Animation\IAnimation.cs" />
+    <Compile Include="Entities\ComponentManagers\PlayerMovementManager.cs" />
+    <Compile Include="Entities\ComponentManagers\PressedKeyInputManager.cs" />
+    <Compile Include="Entities\ComponentManagers\TransformManager.cs" />
+    <Compile Include="Entities\Components\PressedKeyInput.cs" />
+    <Compile Include="Entities\Components\PlayerMovement.cs" />
+    <Compile Include="Entities\Components\Transform.cs" />
     <Compile Include="Entities\Entity.cs" />
     <Compile Include="Entities\IAnimatedEntity.cs" />
     <Compile Include="Entities\Animation\IAnimationManager.cs" />
     <Compile Include="Entities\IEntity.cs" />
+    <Compile Include="Entities\Components\Renderable.cs" />
+    <Compile Include="Entities\ComponentManagers\RenderableManager.cs" />
+    <Compile Include="Entities\KeyInputs.cs" />
     <Compile Include="FNAGame.cs" />
   </ItemGroup>
   <ItemGroup>
@@ -128,6 +137,9 @@
       <ProductName>.NET Framework 3.5 SP1</ProductName>
       <Install>false</Install>
     </BootstrapperPackage>
+  </ItemGroup>
+  <ItemGroup>
+    <Reference Include="System" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>
